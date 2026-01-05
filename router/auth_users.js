@@ -41,18 +41,14 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
   const username = req.user;
   const reviewText = req.body.reviews;
-
-  // Verificar si ya existe review de este usuario
   const existsReview = validateReview(bookEntry, username);
 
   if (existsReview) {
-    // Actualizar la review existente
     bookEntry.reviews = bookEntry.reviews.map(r =>
       r.username === username ? { username, review: reviewText } : r
     );
     res.send(`The review for the book with ISBN ${req.params.isbn} has been updated.`);
   } else {
-    // Agregar nueva review
     bookEntry.reviews.push({ username, review: reviewText });
     res.send(`The review for the book with ISBN ${req.params.isbn} has been added.`);
   }
@@ -79,13 +75,9 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
   if (!bookEntry) {
     return res.status(404).json({ message: "Libro no encontrado" });
   }
-
   const existsReview = validateReview(bookEntry, username);
-
   if (existsReview) {
-    // Filtrar las reviews y eliminar la del usuario
     bookEntry.reviews = bookEntry.reviews.filter(r => r.username !== username);
-
     return res.status(200).json({
       message: `Review for ISBN ${isbn} posted by ${username} has been deleted.`
     });
